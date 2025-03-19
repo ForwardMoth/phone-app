@@ -1,0 +1,18 @@
+package com.nexign.phone_service_app.controller;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/phone")
+public class PhoneController {
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPhone(@PathVariable Long id) {
+        return ResponseEntity.ok(String.format("Phone ID: %d", id));
+    }
+
+}

@@ -39,3 +39,7 @@ mvnw.cmd
 
 ### Git
 .gitattributes
+
+## DB
+data/
+.env

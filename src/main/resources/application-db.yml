@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    hikari:
+      data-source-properties:
+        useUnicode: true
+        characterEncoding: UTF-8
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog.yaml
+
+  h2:
+    console:
+      enabled: true

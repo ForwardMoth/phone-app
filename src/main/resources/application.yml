@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: phone-app
+
+  profiles.include: db
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.H2Dialect

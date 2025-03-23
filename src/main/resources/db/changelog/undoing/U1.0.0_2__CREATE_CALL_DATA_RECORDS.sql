@@ -1,0 +1,1 @@
+drop table if exists call_data_records;

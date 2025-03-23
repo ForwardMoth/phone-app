@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.0.0_1__CREATE_CALLERS
+      author: ForwardMoth
+      changes:
+        - sqlFile:
+            path: db/changelog/migration/V1.0.0_1__CREATE_CALLERS.sql
+        - tagDatabase:
+            tag: task1
+      rollback:
+        - sqlFile:
+            path: db/changelog/undoing/U1.0.0_1__CREATE_CALLERS.sql
+  - changeSet:
+      id: 1.0.0_2__CREATE_CALL_DATA_RECORDS
+      author: ForwardMoth
+      changes:
+        - sqlFile:
+            path: db/changelog/migration/V1.0.0_2__CREATE_CALL_DATA_RECORDS.sql
+        - tagDatabase:
+            tag: task1
+      rollback:
+        - sqlFile:
+            path: db/changelog/undoing/U1.0.0_2__CREATE_CALL_DATA_RECORDS.sql
+  - changeSet:
+      id: 1.0.0_3__CREATE_CALL_DATA_RECORDS
+      author: ForwardMoth
+      changes:
+        - sqlFile:
+            path: db/changelog/migration/V1.0.0_3__INSERT_CALLERS.sql
+        - tagDatabase:
+            tag: task1
+      rollback:
+        - sqlFile:
+            path: db/changelog/undoing/U1.0.0_3__INSERT_CALLERS.sql

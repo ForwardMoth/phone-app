@@ -39,3 +39,8 @@ mvnw.cmd
 
 ### Git
 .gitattributes
+
+## Application
+data/
+.env
+reports/

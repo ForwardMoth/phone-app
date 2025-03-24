@@ -26,4 +26,5 @@ public interface CallDataRepository extends JpaRepository<CallData, Long> {
 
     @Query("SELECT c FROM CallData c WHERE c.startCallTime >= :startDateTime AND c.finishCallTime <= :finishDateTime")
     List<CallData> findByPeriod(LocalDateTime startDateTime, LocalDateTime finishDateTime);
+
 }

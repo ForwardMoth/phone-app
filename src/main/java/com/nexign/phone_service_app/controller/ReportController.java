@@ -2,7 +2,9 @@ package com.nexign.phone_service_app.controller;
 
 import com.nexign.phone_service_app.domain.dto.CallerRequest;
 import com.nexign.phone_service_app.domain.dto.CallerUDRResponse;
+import com.nexign.phone_service_app.domain.dto.GenerateCDRRequest;
 import com.nexign.phone_service_app.domain.dto.MonthRequest;
+import com.nexign.phone_service_app.domain.dto.UuidDto;
 import com.nexign.phone_service_app.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -39,8 +41,18 @@ public class ReportController {
      */
     @PostMapping("/monthCallersUDR")
     public ResponseEntity<List<CallerUDRResponse>> getMonthCallersUDR(@RequestBody MonthRequest request) {
-        reportService.getMonthCallersUDR(request);
         return ResponseEntity.ok().body(reportService.getMonthCallersUDR(request));
+    }
+
+    /**
+     * Метод генерации отчета CDR по пользователю за заданный период времени
+     *
+     * @param request - Тело запроса GenerateCDRRequest
+     * @return UuidDto - Объект с идентификатором создаваемого файла
+     */
+    @PostMapping("/generateCDR")
+    public ResponseEntity<UuidDto> generateCDR(@RequestBody GenerateCDRRequest request) {
+        return ResponseEntity.ok(reportService.generateCDR(request));
     }
 
 }

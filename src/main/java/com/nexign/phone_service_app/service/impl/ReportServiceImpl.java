@@ -4,12 +4,14 @@ import com.nexign.phone_service_app.domain.dto.CallDataTimeDto;
 import com.nexign.phone_service_app.domain.dto.CallerDurationDto;
 import com.nexign.phone_service_app.domain.dto.CallerRequest;
 import com.nexign.phone_service_app.domain.dto.CallerUDRResponse;
+import com.nexign.phone_service_app.domain.dto.GenerateCDRRequest;
 import com.nexign.phone_service_app.domain.dto.MonthRequest;
+import com.nexign.phone_service_app.domain.dto.UuidDto;
 import com.nexign.phone_service_app.domain.entity.CallData;
 import com.nexign.phone_service_app.domain.entity.Caller;
-import com.nexign.phone_service_app.domain.exception.NotFoundException;
+import com.nexign.phone_service_app.domain.exception.BadRequestException;
 import com.nexign.phone_service_app.repository.CallDataRepository;
-import com.nexign.phone_service_app.repository.CallerRepository;
+import com.nexign.phone_service_app.service.CallerService;
 import com.nexign.phone_service_app.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +26,10 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import static com.nexign.phone_service_app.util.Constants.Caller.CALLER_WITH_ID_IS_NOT_FOUND_EXCEPTION;
+import static com.nexign.phone_service_app.util.Constants.PERIOD_SHOULD_BE_FILLED_BAD_REQUEST_EXCEPTION;
 import static com.nexign.phone_service_app.util.DateUtil.getYearMonth;
+import static com.nexign.phone_service_app.util.FileGeneratorUtil.generateCDRFile;
+import static com.nexign.phone_service_app.util.GeneratorUtil.generateRandomUuid;
 import static com.nexign.phone_service_app.util.StringUtil.formatTotalTime;
 import static java.util.Objects.isNull;
 
@@ -34,7 +38,7 @@ import static java.util.Objects.isNull;
 @RequiredArgsConstructor
 public class ReportServiceImpl implements ReportService {
 
-    private final CallerRepository callerRepository;
+    private final CallerService callerService;
     private final CallDataRepository callDataRepository;
 
     /**
@@ -51,8 +55,7 @@ public class ReportServiceImpl implements ReportService {
     @Transactional(readOnly = true)
     public CallerUDRResponse getCallerUDR(CallerRequest request) {
         final var id = request.getId();
-        var caller = callerRepository.findByUuid(id)
-                .orElseThrow(() -> new NotFoundException(String.format(CALLER_WITH_ID_IS_NOT_FOUND_EXCEPTION, id)));
+        final var caller = callerService.findCaller(id);
 
         final var period = request.getPeriod();
         final var callerId = caller.getId();
@@ -112,6 +115,32 @@ public class ReportServiceImpl implements ReportService {
                         .outcomingCall(getTotalTime(entry.getValue().getOutcomingDuration()))
                         .build())
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UuidDto generateCDR(GenerateCDRRequest request) {
+        final var caller = callerService.findCaller(request.getId());
+        final var calledId = caller.getId();
+        final var phoneNumber = caller.getPhoneNumber();
+
+        if (isNull(request.getStartDate()) || isNull(request.getFinishDate())) {
+            throw new BadRequestException(PERIOD_SHOULD_BE_FILLED_BAD_REQUEST_EXCEPTION);
+        }
+
+        final var startDateTime = request.getStartDate().atStartOfDay();
+        final var finishDateTime = request.getFinishDate().atTime(23, 59, 59);
+
+        final var callDataList = callDataRepository.findByCallerAndPeriod(calledId, startDateTime, finishDateTime);
+
+        final var fileId = generateRandomUuid();
+        final var fileName = String.format("%s_%s.csv", phoneNumber, fileId);
+
+        generateCDRFile(fileName, callDataList, phoneNumber);
+
+        return UuidDto.builder()
+                .uuid(fileId)
+                .build();
     }
 
     /**
